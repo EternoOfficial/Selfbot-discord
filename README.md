@@ -23,4 +23,4 @@
 
 Installa le dipendenze con:
 
-npm install mysq12 discord.js-selfbot-v13
+npm install mysql2 discord.js-selfbot-v13
