@@ -6,10 +6,6 @@ const client = new Client({ partials: ['CHANNEL'] });
 const token = "tokenselfbot";
 const authorizedUserId = "useridpersonaluser";
 
-const serversToSearch = [
-  { guildId: "serverid", channelIds: ["channelid"] },
-];
-
 const dbConfig = {
   host: 'localhost',
   user: 'root',
@@ -82,17 +78,20 @@ async function updateMessagesInChannel(channel) {
 }
 
 async function updateAllChannels() {
-  for (const { guildId, channelIds } of serversToSearch) {
-    const guild = await client.guilds.fetch(guildId).catch(() => null);
-    if (!guild) continue;
-    for (const channelId of channelIds) {
-      const channel = await guild.channels.fetch(channelId).catch(() => null);
-      if (channel?.isText()) {
+  for (const [guildId, guild] of client.guilds.cache) {
+    let fetchedGuild = await client.guilds.fetch(guildId).catch(() => null);
+    if (!fetchedGuild) continue;
+
+    const channels = await fetchedGuild.channels.fetch().catch(() => null);
+    if (!channels) continue;
+
+    for (const [channelId, channel] of channels) {
+      if (channel?.isTextBased && typeof channel.isTextBased === "function" && channel.isTextBased()) {
         await updateMessagesInChannel(channel);
       }
     }
   }
-  console.log('Tutti i messaggi aggiornati.');
+  console.log('✅ Tutti i messaggi aggiornati da tutti i server.');
 }
 
 async function searchMessages(discordId) {
